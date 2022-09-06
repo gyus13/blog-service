@@ -3,7 +3,7 @@ import { Entity, Column } from 'typeorm';
 import { CommonEntity } from './common.entity';
 
 @Entity('USER')
-export class User extends CommonEntity {
+export class UserEntity extends CommonEntity {
   @ApiProperty()
   @Column()
   password: string;
