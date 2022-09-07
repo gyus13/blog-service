@@ -34,15 +34,15 @@ export class BoardService {
         where: { password: postBoardRequest.password },
       });
 
-      // 제목 길이 검증
+      // 제목 길이 validation
       if (postBoardRequest.title.length > 20) {
         return response.UNAUTHORIZED;
       }
-      // 본문 길이 검증
+      // 본문 길이 validation
       if (postBoardRequest.text.length > 200) {
         return response.UNAUTHORIZED;
       }
-      // 비밀번호 검증
+      // 비밀번호 validation
       const reg = /^(?=.*?[0-9]).{6,}$/;
       if (!reg.test(postBoardRequest.password)) {
         return response.UNAUTHORIZED;

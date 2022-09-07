@@ -8,7 +8,7 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   /**
-   * description : [의뢰자] 회원가입 API
+   * description :  회원가입 API
    * @param PostSignUpUserRequestDto
    * @returns non-exist
    */
@@ -26,7 +26,7 @@ export class UserController {
   })
   @ApiOperation({ summary: '회원가입 API' })
   @ApiBody({
-    description: '[의뢰자] 회원가입 DTO',
+    description: '회원가입 DTO',
     type: PostSignUpRequesterRequest,
   })
   @Post('sign-up')
