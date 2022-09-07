@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { DataSource, Repository } from 'typeorm';
+import {DataSource, LessThan, Repository} from 'typeorm';
 import { PostSignUpRequesterRequest } from '../user/dto/post-sign-up-user.request.dto';
 import {
   makeResponse,
@@ -19,7 +19,9 @@ export class BoardService {
   constructor(
     private dataSource: DataSource,
     @InjectRepository(UserEntity)
-    private readonly userEntityRepository: Repository<UserEntity>,
+    private readonly userRepository: Repository<UserEntity>,
+    @InjectRepository(BoardEntity)
+    private readonly boardRepository: Repository<BoardEntity>,
   ) {}
 
   async editBoard(postBoardRequest: PostBoardRequest, id) {
@@ -28,7 +30,7 @@ export class BoardService {
     await queryRunner.startTransaction();
     try {
       // 입력한 패스워드에 해당하는 유저값 추출
-      const user = await this.userEntityRepository.findOne({
+      const user = await this.userRepository.findOne({
         where: { password: postBoardRequest.password },
       });
 
@@ -91,7 +93,7 @@ export class BoardService {
     await queryRunner.startTransaction();
     try {
       // 입력한 패스워드에 해당하는 유저값 추출
-      const user = await this.userEntityRepository.findOne({
+      const user = await this.userRepository.findOne({
         where: { password: postBoardRequest.password },
       });
 
@@ -140,7 +142,7 @@ export class BoardService {
     await queryRunner.startTransaction();
     try {
       // 입력한 패스워드에 해당하는 유저값 추출
-      const user = await this.userEntityRepository.findOne({
+      const user = await this.userRepository.findOne({
         where: { password: postBoardRequest.password },
       });
 
@@ -188,5 +190,24 @@ export class BoardService {
     } finally {
       await queryRunner.release();
     }
+  }
+
+  async retrieveBoard(date) {
+    // date 파라미터 있을 시 DESC 정렬
+    const queryBuilder = this.dataSource.createQueryBuilder(
+      BoardEntity,
+      'board',
+    );
+    const data = await queryBuilder
+      .where({
+        createdAt: LessThan(date),
+      })
+      .orderBy('board.createdAt', 'DESC')
+      .take(20)
+      .getMany();
+
+    const result = makeResponse(response.SUCCESS, data);
+
+    return result;
   }
 }
