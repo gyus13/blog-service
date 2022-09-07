@@ -74,7 +74,7 @@ export class BoardController {
   }
 
   /**
-   * description : 게시글 삭 API
+   * description : 게시글 삭제 API
    * @param PostBoardRequestDto
    * @returns non-exist
    */
