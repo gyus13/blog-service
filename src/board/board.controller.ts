@@ -119,12 +119,7 @@ export class BoardController {
     status: 500,
     description: '서버 에러',
   })
-  @ApiQuery({
-    name: 'createdAt',
-    description: 'createdAt',
-    type: Date,
-    required: false,
-  })
+  @ApiQuery({ name: 'createdAt', required: false })
   @ApiOperation({ summary: '게시글 조회 API' })
   @Get()
   async find(@Query('createdAt') date) {
