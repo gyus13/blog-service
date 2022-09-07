@@ -1,13 +1,15 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UserModule } from './user/user.module';
 import { BoardModule } from './board/board.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import {ConfigModule} from "@nestjs/config";
 
 @Module({
   imports: [
-    UserModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     BoardModule,
     TypeOrmModule.forRoot({
       type: 'mysql',
@@ -18,6 +20,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       database: 'RECRUIT',
       entities: ['dist/**/*.entity{.ts,.js}'],
       synchronize: false,
+      timezone: 'Asia/Seoul',
     }),
   ],
   controllers: [AppController],
