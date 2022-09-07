@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { BoardController } from './board.controller';
 import { BoardService } from './board.service';
-import { UserEntity } from '../entity/user.entity';
 import { BoardEntity } from '../entity/board.entity';
 import { HttpModule } from '@nestjs/axios';
 import { ConfigModule } from '@nestjs/config';
@@ -13,7 +12,7 @@ import { ConfigModule } from '@nestjs/config';
   imports: [
     HttpModule,
     ConfigModule,
-    TypeOrmModule.forFeature([UserEntity, BoardEntity]),
+    TypeOrmModule.forFeature([ BoardEntity]),
   ],
 })
 export class BoardModule {}

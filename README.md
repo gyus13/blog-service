@@ -22,6 +22,7 @@
 
 #### 1. 블로그 포스팅 C,U,D
 - 따로 인증기능을 구현하지 않아, 암호화한 비밀번호를 이용해 request로 입력된 비밀번호와 비교하여 인증구현
+- bcrypt를 사용해서 hash 알고리즘을 이용하여 비밀번호 암호화
 
 #### 2. 블로그 포스팅 리스트 페이징
 
@@ -34,7 +35,7 @@
 
 ### 2. ERD
 
-<img width="785" alt="스크린샷 2022-09-01 오후 10 44 18" src="https://user-images.githubusercontent.com/65529348/188864454-4552c9d0-86a1-4307-a660-814ee38933bb.png">
+<img width="785" alt="스크린샷 2022-09-01 오후 10 44 18" src="https://user-images.githubusercontent.com/65529348/188894680-e6e7e5b7-7040-4def-b0b7-be69fcd3c3b2.png">
 </br>
 
 ### 3. Swagger 

@@ -1,12 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource, LessThan, Repository } from 'typeorm';
-import { PostSignUpRequesterRequest } from '../user/dto/post-sign-up-user.request.dto';
 import {
   makeResponse,
   saltHashPassword,
   validatePassword,
 } from '../config/function.utils';
-import { UserEntity } from '../entity/user.entity';
 import { response } from '../config/response.utils';
 import { PostBoardRequest } from './dto/post-board.request.dto';
 import { BoardEntity } from '../entity/board.entity';
@@ -21,8 +19,6 @@ import { ConfigService } from '@nestjs/config';
 export class BoardService {
   constructor(
     private dataSource: DataSource,
-    @InjectRepository(UserEntity)
-    private readonly userRepository: Repository<UserEntity>,
     @InjectRepository(BoardEntity)
     private readonly boardRepository: Repository<BoardEntity>,
     private readonly httpService: HttpService,
@@ -35,7 +31,7 @@ export class BoardService {
     await queryRunner.startTransaction();
     try {
       // 입력한 패스워드에 해당하는 유저값 추출
-      const user = await this.userRepository.findOne({
+      const board = await this.boardRepository.findOne({
         where: { password: postBoardRequest.password },
       });
 
@@ -54,7 +50,7 @@ export class BoardService {
       }
       const hashedPassword = await bcrypt.hash(postBoardRequest.password, 3);
 
-      if (user.password != hashedPassword) {
+      if (board.password != hashedPassword) {
         return response.UNAUTHORIZED;
       }
 
@@ -97,8 +93,8 @@ export class BoardService {
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      // 입력한 패스워드에 해당하는 유저값 추출
-      const user = await this.userRepository.findOne({
+      // 입력한 패스워드에 해당하는 board값 추출
+      const board = await this.boardRepository.findOne({
         where: { password: postBoardRequest.password },
       });
 
@@ -109,7 +105,7 @@ export class BoardService {
       }
       const hashedPassword = await bcrypt.hash(postBoardRequest.password, 3);
 
-      if (user.password != hashedPassword) {
+      if (board.password != hashedPassword) {
         return response.UNAUTHORIZED;
       }
 
@@ -146,11 +142,6 @@ export class BoardService {
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      // 입력한 패스워드에 해당하는 유저값 추출
-      const user = await this.userRepository.findOne({
-        where: { password: postBoardRequest.password },
-      });
-
       // 제목 길이 검증
       if (postBoardRequest.title.length > 20) {
         return response.UNAUTHORIZED;
@@ -166,14 +157,14 @@ export class BoardService {
       }
       const hashedPassword = await bcrypt.hash(postBoardRequest.password, 3);
 
-      if (user.password != hashedPassword) {
-        return response.UNAUTHORIZED;
-      }
+      // const weather = await this.getWeather()
+
       // board 인스턴스 생성후, 정보 담는 부분
       const board = new BoardEntity();
       board.title = postBoardRequest.title;
       board.text = postBoardRequest.text;
-      board.weather = await this.getWeather();
+      board.password = hashedPassword;
+      board.weather = '맑음';
       await queryRunner.manager.save(board);
 
       // Response의 result 객체에 Data를 담는 부분
@@ -199,10 +190,9 @@ export class BoardService {
 
   async retrieveBoard(date) {
     // date 파라미터 있을 시 DESC 정렬
-    const queryBuilder = this.dataSource.createQueryBuilder(
-      BoardEntity,
-      'board',
-    );
+    const queryBuilder = this.dataSource
+      .createQueryBuilder(BoardEntity, 'board')
+      .orderBy('board.createdAt', 'DESC');
 
     if (date) {
       await queryBuilder.where({
@@ -211,7 +201,6 @@ export class BoardService {
     }
 
     const data = await queryBuilder
-      .orderBy('board.createdAt', 'DESC')
       .take(20)
       .select(['board.createdAt', 'board.title', 'board.text', 'board.weather'])
       .getMany();
@@ -224,7 +213,7 @@ export class BoardService {
   async getWeather(): Promise<string> {
     const resData = await firstValueFrom(
       this.httpService.get(
-        `https://api.weatherapi.com/v1/current.json?key=${process.env.WEATHER_API_KEY}&q='37.5666805,126.9784147'&lang=ko`,
+        `https://api.weatherapi.com/v1/current.json?key='d8f3af37dc344b388d062909220709'&q='37.5666805,126.9784147'&lang=ko`,
       ),
     );
 
