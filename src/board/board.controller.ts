@@ -7,11 +7,12 @@ import {
   Patch,
   Post, Query,
 } from '@nestjs/common';
-import {ApiBody, ApiOperation, ApiQuery, ApiResponse} from '@nestjs/swagger';
+import {ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags} from '@nestjs/swagger';
 import { PostSignUpRequesterRequest } from '../user/dto/post-sign-up-user.request.dto';
 import { PostBoardRequest } from './dto/post-board.request.dto';
 import { BoardService } from './board.service';
 
+@ApiTags('Board')
 @Controller('board')
 export class BoardController {
   constructor(private readonly boardService: BoardService) {}
