@@ -13,7 +13,9 @@ import { BoardEntity } from '../entity/board.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { Status } from '../common/variable.utils';
-import {WeatherService} from "../weather/weather.service";
+import { firstValueFrom } from 'rxjs';
+import { HttpService } from '@nestjs/axios';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class BoardService {
@@ -23,7 +25,8 @@ export class BoardService {
     private readonly userRepository: Repository<UserEntity>,
     @InjectRepository(BoardEntity)
     private readonly boardRepository: Repository<BoardEntity>,
-    private readonly weatherService: WeatherService
+    private readonly httpService: HttpService,
+    private readonly configService: ConfigService,
   ) {}
 
   async editBoard(postBoardRequest: PostBoardRequest, id) {
@@ -165,13 +168,12 @@ export class BoardService {
 
       if (user.password != hashedPassword) {
         return response.UNAUTHORIZED;
-
-
+      }
       // board 인스턴스 생성후, 정보 담는 부분
       const board = new BoardEntity();
       board.title = postBoardRequest.title;
       board.text = postBoardRequest.text;
-      board.weather = await this.weatherService.getWeather();
+      board.weather = await this.getWeather();
       await queryRunner.manager.save(board);
 
       // Response의 result 객체에 Data를 담는 부분
@@ -216,5 +218,17 @@ export class BoardService {
     const result = makeResponse(response.SUCCESS, data);
 
     return result;
+  }
+
+  async getWeather(): Promise<string> {
+    const resData = await firstValueFrom(
+      this.httpService.get(
+        `https://api.weatherapi.com/v1/current.json?key=${process.env.WEATHER_API_KEY}&q='37.5666805,126.9784147'&lang=ko`,
+      ),
+    );
+
+    const { condition } = await resData.data.current;
+
+    return condition.text;
   }
 }
