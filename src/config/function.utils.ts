@@ -35,3 +35,13 @@ export function saltHashPassword(password: string) {
   const salt = generateRandomString(16);
   return sha512(password, salt);
 }
+
+// 비밀번호 검증함수
+export function validatePassword(
+    password: string,
+    salt: string,
+    hashedPassword: string,
+) {
+    const passwordData = sha512(password, salt);
+    return passwordData.hashedPassword == hashedPassword;
+}
