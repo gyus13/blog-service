@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import {DataSource, LessThan, Repository} from 'typeorm';
+import { DataSource, LessThan, Repository } from 'typeorm';
 import { PostSignUpRequesterRequest } from '../user/dto/post-sign-up-user.request.dto';
 import {
   makeResponse,
@@ -198,10 +198,14 @@ export class BoardService {
       BoardEntity,
       'board',
     );
-    const data = await queryBuilder
-      .where({
+
+    if (date) {
+      await queryBuilder.where({
         createdAt: LessThan(date),
-      })
+      });
+    }
+
+    const data = await queryBuilder
       .orderBy('board.createdAt', 'DESC')
       .take(20)
       .getMany();
