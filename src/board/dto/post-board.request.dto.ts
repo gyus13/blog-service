@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class PostBoardRequesterRequest {
+export class PostBoardRequest {
   @ApiProperty({
     example: 'user1234',
     description: 'password',
