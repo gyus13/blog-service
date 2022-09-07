@@ -4,7 +4,6 @@ import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { BoardModule } from './board/board.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { WeatherModule } from './weather/weather.module';
 
 @Module({
   imports: [
@@ -20,7 +19,6 @@ import { WeatherModule } from './weather/weather.module';
       entities: ['dist/**/*.entity{.ts,.js}'],
       synchronize: false,
     }),
-    WeatherModule,
   ],
   controllers: [AppController],
   providers: [AppService],
