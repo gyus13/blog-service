@@ -213,6 +213,7 @@ export class BoardService {
     const data = await queryBuilder
       .orderBy('board.createdAt', 'DESC')
       .take(20)
+      .select(['board.createdAt', 'board.title', 'board.text', 'board.weather'])
       .getMany();
 
     const result = makeResponse(response.SUCCESS, data);
