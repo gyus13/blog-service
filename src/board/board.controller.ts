@@ -64,7 +64,7 @@ export class BoardController {
     description: '게시글 수정 DTO',
     type: PostBoardRequest,
   })
-  @Patch(':/id')
+  @Patch('/:id')
   PatchBoard(
     @Body() postBoardRequest: PostBoardRequest,
     @Param('id') id: number,
@@ -94,7 +94,7 @@ export class BoardController {
     description: '게시글 삭제 DTO',
     type: PostBoardRequest,
   })
-  @Delete(':/id')
+  @Delete('/:id')
   DeleteBoard(
     @Body() postBoardRequest: PostBoardRequest,
     @Param('id') id: number,

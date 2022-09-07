@@ -30,9 +30,9 @@ export class BoardService {
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      // 입력한 패스워드에 해당하는 유저값 추출
+      // 입력한 id에 해당하는 게시글 추출
       const board = await this.boardRepository.findOne({
-        where: { password: postBoardRequest.password },
+        where: { id: id },
       });
 
       // 제목 길이 validation
@@ -48,9 +48,13 @@ export class BoardService {
       if (!reg.test(postBoardRequest.password)) {
         return response.UNAUTHORIZED;
       }
-      const hashedPassword = await bcrypt.hash(postBoardRequest.password, 3);
 
-      if (board.password != hashedPassword) {
+
+      const isPasswordCorrected = await bcrypt.compare(
+        postBoardRequest.password,
+        board.password,
+      );
+      if (!isPasswordCorrected) {
         return response.UNAUTHORIZED;
       }
 
@@ -93,9 +97,9 @@ export class BoardService {
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      // 입력한 패스워드에 해당하는 board값 추출
+      // 입력한 id에 해당하는 게시글 추출
       const board = await this.boardRepository.findOne({
-        where: { password: postBoardRequest.password },
+        where: { id: id },
       });
 
       // 비밀번호 검증
@@ -103,9 +107,12 @@ export class BoardService {
       if (!reg.test(postBoardRequest.password)) {
         return response.UNAUTHORIZED;
       }
-      const hashedPassword = await bcrypt.hash(postBoardRequest.password, 3);
 
-      if (board.password != hashedPassword) {
+      const isPasswordCorrected = await bcrypt.compare(
+          postBoardRequest.password,
+          board.password,
+      );
+      if (!isPasswordCorrected) {
         return response.UNAUTHORIZED;
       }
 
@@ -157,14 +164,14 @@ export class BoardService {
       }
       const hashedPassword = await bcrypt.hash(postBoardRequest.password, 3);
 
-      // const weather = await this.getWeather()
+      const weather = await this.getWeather();
 
       // board 인스턴스 생성후, 정보 담는 부분
       const board = new BoardEntity();
       board.title = postBoardRequest.title;
       board.text = postBoardRequest.text;
       board.password = hashedPassword;
-      board.weather = '맑음';
+      board.weather = weather;
       await queryRunner.manager.save(board);
 
       // Response의 result 객체에 Data를 담는 부분
@@ -201,6 +208,9 @@ export class BoardService {
     }
 
     const data = await queryBuilder
+      .andWhere('board.status like :status', {
+        status: Status.ACTIVE,
+      })
       .take(20)
       .select(['board.createdAt', 'board.title', 'board.text', 'board.weather'])
       .getMany();
@@ -211,14 +221,19 @@ export class BoardService {
   }
 
   async getWeather(): Promise<string> {
-    const resData = await firstValueFrom(
-      this.httpService.get(
-        `https://api.weatherapi.com/v1/current.json?key='d8f3af37dc344b388d062909220709'&q='37.5666805,126.9784147'&lang=ko`,
-      ),
-    );
+    try {
+      const key = this.configService.get<string>('WEATHER_API_KEY');
+      const resData = await firstValueFrom(
+        this.httpService.get(
+          `https://api.weatherapi.com/v1/current.json?key=${key}&q=Korea&lang=ko`,
+        ),
+      );
 
-    const { condition } = await resData.data.current;
+      const { condition } = await resData.data.current;
 
-    return condition.text;
+      return condition.text;
+    } catch (error) {
+      console.error(error.message);
+    }
   }
 }

@@ -27,6 +27,8 @@
 #### 2. 블로그 포스팅 리스트 페이징
 
 - 무한스크롤을 위해서 createdAt(생성시간)으로 최신순 정렬 후 Cursor 페이지네이션을 구현했습니다.
+<img width="785" alt="스크린샷 2022-09-01 오후 10 44 18" src="https://user-images.githubusercontent.com/65529348/188895256-5b8c9c5c-e1c0-4369-9c79-441fd7f3a026.png">
+- timestamp 타입의 createdAt을 우리나라 현재 시간으로 맞추기위해 timezone을 설정했습니다.
 - offset기반 방식과 고민 후 더 빠르고, 무한스크롤에 맞는 페이지네이션으로 생각하여 구현했습니다.
 
 #### 3. weatherAPI 구현
