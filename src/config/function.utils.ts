@@ -38,10 +38,10 @@ export function saltHashPassword(password: string) {
 
 // 비밀번호 검증함수
 export function validatePassword(
-    password: string,
-    salt: string,
-    hashedPassword: string,
+  password: string,
+  salt: string,
+  hashedPassword: string,
 ) {
-    const passwordData = sha512(password, salt);
-    return passwordData.hashedPassword == hashedPassword;
+  const passwordData = sha512(password, salt);
+  return passwordData.hashedPassword == hashedPassword;
 }
