@@ -12,6 +12,7 @@ import { PostBoardRequest } from './dto/post-board.request.dto';
 import { BoardEntity } from '../entity/board.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
+import { Status } from '../common/variable.utils';
 
 @Injectable()
 export class BoardService {
@@ -66,6 +67,55 @@ export class BoardService {
       // Response의 result 객체에 Data를 담는 부분
       const data = {
         message: '게시글이 수정 되었습니다.',
+      };
+
+      const result = makeResponse(response.SUCCESS, data);
+
+      // Commit
+      await queryRunner.commitTransaction();
+
+      return result;
+    } catch (error) {
+      // Rollback
+      await queryRunner.rollbackTransaction();
+      console.log(error);
+      return response.ERROR;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  async deleteBoard(postBoardRequest: PostBoardRequest, id) {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      // 입력한 패스워드에 해당하는 유저값 추출
+      const user = await this.userEntityRepository.findOne({
+        where: { password: postBoardRequest.password },
+      });
+
+      // 비밀번호 검증
+      const reg = /^(?=.*?[0-9]).{6,}$/;
+      if (!reg.test(postBoardRequest.password)) {
+        return response.UNAUTHORIZED;
+      }
+      const hashedPassword = await bcrypt.hash(postBoardRequest.password, 3);
+
+      if (user.password != hashedPassword) {
+        return response.UNAUTHORIZED;
+      }
+
+      // board 삭제
+      await queryRunner.manager.update(
+        BoardEntity,
+        { id: id },
+        { status: Status.INACTIVE },
+      );
+
+      // Response의 result 객체에 Data를 담는 부분
+      const data = {
+        message: '게시글이 삭제 되었습니다.',
       };
 
       const result = makeResponse(response.SUCCESS, data);
